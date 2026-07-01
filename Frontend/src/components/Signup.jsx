@@ -49,11 +49,10 @@ const Signup = () => {
       <div className="w-full md:w-1/2 flex items-center justify-center p-4">
         <form onSubmit={handleSignup} className="max-w-md w-full space-y-6 px-4">
           <div className="space-y-4">
-            <img
-              src=""
-              alt="HomeBook Logo"
-              className="mx-auto h-16 w-auto mb-6"
-            />
+            <div className="flex flex-col items-center justify-center mb-6">
+              <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2e42bf] to-[#d037a2]">HomeBook</span>
+              <p className="text-gray-500 text-sm mt-1">Create an account to join the community</p>
+            </div>
 
             <div className="space-y-4">
               <Input

@@ -63,6 +63,9 @@ const CreateListing = ({ open, setOpen}) => {
         "http://localhost:8000/api/v1/property/addproperty",
         formDataToSend,
         {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          },
           withCredentials: true,
         }
       );
@@ -169,6 +172,7 @@ const CreateListing = ({ open, setOpen}) => {
                 onChange={fileChangeHandler}
               />
               <Button
+                type="button"
                 onClick={() => imageRef.current.click()}
                 className="w-fit mx-auto bg-blue-400 hover:bg-blue-500 flex text-center mt-3"
               >

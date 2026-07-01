@@ -2,9 +2,10 @@ import { Conversation } from "../models/conversation.model.js";
 import { Message } from "../models/message.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 const sendMessage = asyncHandler(async (req, res) => {
-  const senderId = req.id;
+  const senderId = req.user._id;
   const receiverId = req.params.id;
   const { message } = req.body;
 
@@ -32,12 +33,16 @@ const sendMessage = asyncHandler(async (req, res) => {
   await Promise.all([conversation.save(), newMessage.save()]);
 
   // Implement socket.io for real time data transfer
+  const receiverSocketId = getReceiverSocketId(receiverId);
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("newMessage", newMessage);
+  }
 
   return res.status(200).json(new ApiResponse(201, newMessage, ""));
 });
 
 const getMessage =  asyncHandler ( async (req,res) =>{
-    const senderId = req.id
+    const senderId = req.user._id
     const receiverId = req.params.id
     const conversation = await Conversation.findOne({
         partcipants:{$all:[senderId,receiverId]}

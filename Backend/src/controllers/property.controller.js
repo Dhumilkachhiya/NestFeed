@@ -60,7 +60,7 @@ const createProperty = asyncHandler(async (req, res) => {
 // Get All Properties
 const getProperties = asyncHandler(async (req, res) => {
   const properties = await Property.find().populate('user', 'name email');
-  res.status(200).json(properties);
+  res.status(200).json(new ApiResponse(200, properties, "Properties fetched successfully"));
 });
 
 

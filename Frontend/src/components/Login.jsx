@@ -34,7 +34,7 @@ const Login = () => {
         }
       );
       if (res.data.success) {
-        dispatch(setAuthUser(res.data.user));
+        dispatch(setAuthUser(res.data.data.user));
         navigate("/");
         toast.success(res.data.message);
         setInput({
@@ -58,11 +58,10 @@ const Login = () => {
       <div className="w-full md:w-1/2 flex items-center justify-center p-4">
         <form onSubmit={signupHandler} className="max-w-md w-full space-y-6 px-4">
           <div className="space-y-4">
-            <img
-              src=""
-              alt="HomeBook Logo"
-              className="mx-auto h-16 w-auto mb-6"
-            />
+            <div className="flex flex-col items-center justify-center mb-6">
+              <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2e42bf] to-[#d037a2]">HomeBook</span>
+              <p className="text-gray-500 text-sm mt-1">Welcome back, please log in to continue</p>
+            </div>
 
             <div className="space-y-4">
               <Input

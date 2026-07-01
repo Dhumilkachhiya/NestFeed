@@ -1,6 +1,6 @@
 import { Story } from "../models/story.model.js";
 import { User } from "../models/user.model.js";
-import { v2 as cloudinary } from "cloudinary";
+import cloudinary from "../utils/cloudinary.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -32,7 +32,7 @@ export const createStory = asyncHandler(async (req, res) => {
       $push: { stories: story._id },
     });
 
-    res.status(201).json(new ApiResponse(202, story, "Story createsd"));
+    res.status(201).json(new ApiResponse(201, story, "Story created successfully"));
   } catch (err) {
     console.error("Upload Error:", err); // ✅ Log Cloudinary or other errors
     res
@@ -48,7 +48,7 @@ export const getStories = async (req, res) => {
       .populate("user", "username profilePicture")
       .sort("-createdAt");
 
-    res.status(200).json(stories);
+    res.status(200).json(new ApiResponse(200, stories, "Stories fetched successfully"));
   } catch (error) {
     res.status(500).json({ message: "Error fetching stories" });
   }

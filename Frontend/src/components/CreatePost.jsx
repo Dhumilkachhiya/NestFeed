@@ -45,12 +45,15 @@ const CreatePost = ({ open, setOpen }) => {
         "http://localhost:8000/api/v1/post/addpost",
         formData,
         {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          },
           withCredentials: true,
         }
       );
 
       if (res?.data?.success) {
-        dispatch(setPosts([res.data.post, ...posts]))
+        dispatch(setPosts([res.data.data.post, ...posts]))
         toast.success(res.data.message);
         setOpen(false);
       } else {

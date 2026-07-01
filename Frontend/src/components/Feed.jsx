@@ -1,17 +1,21 @@
 import React from 'react'
 import Posts from './Posts'
 import StoryCarousel from './StoryCarousel'
-import useGetFeaturedProperties from '../hooks/useGetFeaturedProperties.js'
-
+import { useSelector } from 'react-redux'
+import RightSidebar from './RightSidebar'
 
 const Feed = () => {
+  const { user } = useSelector(store => store.auth);
+
   return (
-    <div className="flex-1 my-8 flex flex-col items-center pl-[20%]">
-      <StoryCarousel 
-        useGetFeaturedProperties={useGetFeaturedProperties}
-        className="border-2 border-[#2e42bf]/10 rounded-xl p-2"
-      />
-      <Posts />
+    <div className="flex w-full justify-center gap-12 py-8 px-4">
+      <div className="flex flex-col w-full max-w-xl">
+        <StoryCarousel currentUser={user} />
+        <Posts />
+      </div>
+      <div className="hidden lg:block w-80">
+        <RightSidebar />
+      </div>
     </div>
   );
 };

@@ -4,9 +4,9 @@ import LeftSidebar from './LeftSidebar'
 
 const MainLayout = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#2e42bf]/5 to-[#d037a2]/5">
+    <div className="flex min-h-screen bg-gray-50">
       <LeftSidebar />
-      <div className="ml-[20%] p-6">
+      <div className="flex-1 max-w-5xl mx-auto w-full">
         <Outlet />
       </div>
     </div>

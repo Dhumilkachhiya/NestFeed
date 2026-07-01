@@ -10,16 +10,12 @@ const generateAccessTokenAndRefreshToken = async (userid) => {
   try {
     const user = await User.findById(userid);
     const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
 
-    console.log("Generated Access Token:", accessToken);
-
+    user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
-    // Fetch again from DB to verify
-    const updatedUser = await User.findById(userid);
-    console.log("User after saving refreshToken:", updatedUser);
-
-    return { accessToken };
+    return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiErrors(500, "Something went wrong while generating Token");
   }
@@ -30,44 +26,42 @@ const register = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      throw new ApiErrors(401, "Something is missing");
+      throw new ApiErrors(401, "All fields are required");
     }
 
     const existedUser = await User.findOne({ email });
     if (existedUser) {
-      throw new ApiErrors(400, "Email already in used");
+      throw new ApiErrors(400, "Email already in use");
     }
-    console.log(username);
 
     const user = await User.create({
       username: username.toLowerCase(),
       email,
       password,
     });
-    console.log("User created:", user);
 
     const createdUser = await User.findById(user._id).select("-password");
 
     if (!createdUser) {
-      throw new ApiErrors(401, "Something went wrong while registring user");
+      throw new ApiErrors(500, "Something went wrong while registering user");
     }
 
     return res
       .status(201)
-      .json(new ApiResponse(201, createdUser, "User register successfully"));
+      .json(new ApiResponse(201, createdUser, "User registered successfully"));
   } catch (error) {
-    console.log(error);
-    res.status(500).json(new ApiErrors(500, "Internal server error"));
+    // Re-throw ApiErrors so the proper status code reaches the client
+    throw error;
   }
 });
 
 const login = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    throw new ApiErrors(401, "Email or Username is required");
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new ApiErrors(401, "Email and password are required");
   }
 
-  const user = await User.findOne({ username: username.toLowerCase() });
+  const user = await User.findOne({ email: email.toLowerCase() });
 
   if (!user) {
     throw new ApiErrors(400, "User not exists");
@@ -79,7 +73,7 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiErrors(401, "Invalid user credentials");
   }
 
-  const { accessToken } = await generateAccessTokenAndRefreshToken(user._id);
+  const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id);
 
   await user.save();
 
@@ -87,7 +81,7 @@ const login = asyncHandler(async (req, res) => {
   const populatedPosts = await Promise.all(
     user.post.map(async (postId) => {
       const post = await Post.findById(postId);
-      if (post.author.equals(user._id)) {
+      if (post && post.author.equals(user._id)) {
         return post;
       }
       return null;
@@ -105,17 +99,16 @@ const login = asyncHandler(async (req, res) => {
     post: populatedPosts,
   };
 
-  console.log("Before setting cookies, request cookies:", req.cookies);
+
 
   const option = {
     httpOnly: true,
-    secure: false,
-    sameSite: "None",
     maxAge: 24 * 60 * 60 * 1000,
   };
 
   return res
     .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
     .status(200)
     .json(
       new ApiResponse(
@@ -123,6 +116,7 @@ const login = asyncHandler(async (req, res) => {
         {
           user: loggedInUser,
           accessToken,
+          refreshToken,
         },
         "User loggedIn Successfully"
       )
@@ -134,17 +128,16 @@ const logout = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "User not authenticated" });
   }
 
-  console.log("Cookies before logout:", req.cookies);
+
 
   const option = {
     httpOnly: true,
-    secure: true,
-    sameSite: "strict",
   };
 
   res
     .status(200)
     .clearCookie("accessToken", option)
+    .clearCookie("refreshToken", option)
     .json(new ApiResponse(200, {}, "User logged out"));
 });
 
@@ -158,7 +151,7 @@ const getProfile = asyncHandler(async (req, res) => {
 
 const editProfile = asyncHandler(async (req, res) => {
   try {
-    const userId = req.id;
+    const userId = req.user._id;
     const { bio, gender } = req.body;
     const profilePicture = req.file;
 
@@ -186,7 +179,7 @@ const editProfile = asyncHandler(async (req, res) => {
 });
 
 const getSuggestedUsers = asyncHandler(async (req, res) => {
-  const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select(
+  const suggestedUsers = await User.find({ _id: { $ne: req.user._id } }).select(
     "-password"
   );
   if (!suggestedUsers) {
@@ -200,10 +193,10 @@ const getSuggestedUsers = asyncHandler(async (req, res) => {
 
 const followOrUnfollow = asyncHandler(async (req, res) => {
   try {
-    console.log("User ID from token:", req.id); // Debugging line
+    console.log("User ID from token:", req.user._id); // Debugging line
     console.log("Params ID:", req.params.id);
 
-    const myAccount = req.id; // My logged in account
+    const myAccount = req.user._id; // My logged in account
     const otherAccount = req.params.id; // Account that i want to follow or unfollow
 
     if (myAccount === otherAccount) {

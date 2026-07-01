@@ -11,7 +11,7 @@ const addNewPost = asyncHandler(async (req, res) => {
   try {
     const { caption } = req.body;
     const image = req.file;
-    const authorId = req.id;
+    const authorId = req.user._id;
 
     if (!image) {
       throw new ApiErrors(400, "Image required");
@@ -101,7 +101,7 @@ const getAllPostOnFeed = asyncHandler(async (req, res) => {
 })
 
 const getUserPost = asyncHandler(async (req, res) => {
-  const authorId = req.id;
+  const authorId = req.user._id;
   const posts = await Post.find({ author: authorId })
     .sort({ createdAt: -1 })
     .populate({ path: "author", select: "username profilePicture" })
@@ -120,7 +120,7 @@ const getUserPost = asyncHandler(async (req, res) => {
 });
 
 const likePost = asyncHandler(async (req, res) => {
-  const likingUser = req.id;
+  const likingUser = req.user._id;
   const postId = req.params.id;
   const post = await Post.findById(postId);
   if (!post) {
@@ -138,7 +138,7 @@ const likePost = asyncHandler(async (req, res) => {
 });
 
 const disLikePost = asyncHandler(async (req, res) => {
-  const dislikingUser = req.id;
+  const dislikingUser = req.user._id;
   const postId = req.params.id;
   const post = await Post.findById(postId);
   if (!post) {
@@ -157,7 +157,7 @@ const disLikePost = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
   const postId = req.params.id;
-  const commentingUser = req.id;
+  const commentingUser = req.user._id;
   const { text } = req.body;
 
   const post = await Post.findById(postId);
@@ -166,11 +166,13 @@ const addComment = asyncHandler(async (req, res) => {
     throw new ApiErrors(401, "Text is required");
   }
 
-  const comment = await Comment.create({
+  let comment = await Comment.create({
     text,
     author: commentingUser,
     post: postId,
-  }).populate({
+  });
+
+  await comment.populate({
     path: "author",
     select: "username profilePicture",
   });
@@ -202,7 +204,7 @@ const getCommentsOfPost = asyncHandler(async (req, res) => {
 
 const deletePost = asyncHandler(async (req, res) => {
   const postId = req.params.id;
-  const authorId = req.id;
+  const authorId = req.user._id;
 
   const post = await Post.findById(postId);
   if (!post) {
@@ -230,7 +232,7 @@ const deletePost = asyncHandler(async (req, res) => {
 
 const savedPost = asyncHandler(async (req, res) => {
   const postId = req.params.id;
-  const authorId = req.id;
+  const authorId = req.user._id;
   const post = await Post.findById(postId);
   if (!post) {
     throw new ApiErrors(400, "Post not found");
