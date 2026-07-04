@@ -1,23 +1,24 @@
-# 📸 Instagram Clone — HomeBook
+# 📸 NestFeed — Real Estate Social Network
 
 ![MERN Stack](https://img.shields.io/badge/Stack-MERN-blue.svg)
 ![React](https://img.shields.io/badge/Frontend-React_19-cyan.svg)
 ![Node.js](https://img.shields.io/badge/Backend-Node.js-green.svg)
 ![MongoDB](https://img.shields.io/badge/Database-MongoDB-darkgreen.svg)
+![Socket.io](https://img.shields.io/badge/WebSockets-Socket.io-black.svg)
 ![Tailwind](https://img.shields.io/badge/Styling-Tailwind_CSS-38B2AC.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A full-stack, feature-rich social media platform inspired by Instagram built using the **MERN (MongoDB, Express.js, React, Node.js)** stack. This platform allows users to share moments through images, engage with content, communicate directly with other users, view 24-hour stories, and explore real-estate property listings all in one application.
+A full-stack, feature-rich real estate social media platform inspired by Instagram. Built using the **MERN (MongoDB, Express.js, React, Node.js)** stack and **Socket.io**, this platform allows users to share moments through images, engage with property content, communicate directly via real-time messaging, view ephemeral 24-hour stories, and explore real-estate property listings all in one seamless application.
 
 ## ✨ Features
 
+- **Real-Time Direct Messaging (DM):** Engage in private 1-on-1 conversations with other users. Powered by `Socket.io`, messages and online/offline statuses are delivered instantly without page reloads.
+- **Dynamic State Synchronization:** Like, unlike, comment, bookmark, and follow users seamlessly. Global state management using `Redux Toolkit` ensures the UI updates instantly across all components.
+- **Post Management:** Upload property images with captions. Images are optimized and resized using `Sharp` before being securely stored on `Cloudinary`.
+- **Ephemeral Stories:** Upload 24-hour expiring stories. Automated clean-up is handled via MongoDB TTL (Time-To-Live) indexes.
+- **Real Estate Listings:** A dedicated section where users can list and explore real-estate properties (For Sale, Sold, Rent) with multiple images.
 - **User Authentication:** Secure signup and login using JWT (JSON Web Tokens) and bcrypt for password hashing.
-- **Post Management:** Upload images with captions. Images are optimized and resized using `Sharp` before being securely stored on `Cloudinary`.
-- **Engagement:** Like, unlike, comment, and bookmark posts. All data is persisted in real-time.
-- **Direct Messaging (DM):** Engage in private 1-on-1 conversations with other users.
-- **Stories:** Upload 24-hour expiring stories. Automated clean-up via MongoDB TTL (Time-To-Live) indexes.
-- **Real Estate Listings (HomeBook):** A unique extension where users can list and explore real-estate properties (For Sale, Sold, Rent) with multiple images.
-- **Profile Management:** Edit bio, gender, profile picture, and track followers/following interactions.
+- **Profile Management:** Dynamic public profiles, profile editing (bio, gender, profile picture), and tracking of followers/following interactions.
 - **State Persistence:** Seamless user experience with `redux-persist` to maintain state across browser refreshes.
 
 ## 🛠️ Technology Stack
@@ -26,6 +27,7 @@ A full-stack, feature-rich social media platform inspired by Instagram built usi
 - **Framework:** React 19 + Vite
 - **Routing:** React Router v7
 - **State Management:** Redux Toolkit + Redux Persist
+- **Real-Time Client:** Socket.io-client
 - **Styling:** Tailwind CSS v4, Radix UI, Framer Motion
 - **Icons/UI:** Lucide React, React Icons, Sonner (Toasts)
 - **HTTP Client:** Axios
@@ -33,6 +35,7 @@ A full-stack, feature-rich social media platform inspired by Instagram built usi
 ### Backend
 - **Environment:** Node.js + Express.js
 - **Database:** MongoDB Atlas (with Mongoose ODM)
+- **Real-Time Server:** Socket.io
 - **Authentication:** jsonwebtoken (JWT), bcrypt
 - **File Uploads:** Multer, DataURI, Cloudinary
 - **Image Optimization:** Sharp
@@ -50,8 +53,8 @@ Make sure you have the following installed on your machine:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/Instagram_clone-main.git
-   cd Instagram_clone-main
+   git clone https://github.com/Dhumilkachhiya/Estate-Insta.git
+   cd Estate-Insta
    ```
 
 2. **Backend Setup:**
@@ -94,21 +97,21 @@ The database uses MongoDB and is structured around the following key collections
 - **Users:** Stores authentication data, profile details, follower/following relationships, and bookmarks.
 - **Posts:** Contains captions, Cloudinary image URLs, author details, likes array, and comments.
 - **Comments:** Text, author, and associated post reference.
-- **Conversations & Messages:** Two-collection design for direct messaging.
+- **Conversations & Messages:** Two-collection design for direct messaging and real-time Socket.io delivery.
 - **Stories:** Uses TTL indexes (`expiresAt`) to auto-delete documents 24 hours after creation.
 - **Properties:** Real-estate specific details like price, location, bedrooms, and status.
 
 ## 📡 Key API Endpoints
 
 - **Auth:** `POST /api/v1/users/register`, `POST /api/v1/users/login`, `GET /api/v1/users/logout`
-- **Users:** `GET /api/v1/users/:id/profile`, `POST /api/v1/users/followOrUnfollow/:id`
-- **Posts:** `POST /api/v1/post/addpost`, `GET /api/v1/post/all`, `POST /api/v1/post/:id/comment`, `GET /api/v1/post/:id/like`
+- **Users:** `GET /api/v1/users/:id/profile`, `POST /api/v1/users/followOrUnfollow/:id`, `POST /api/v1/users/profile/edit`
+- **Posts:** `POST /api/v1/post/addpost`, `GET /api/v1/post/all`, `POST /api/v1/post/:id/comment`, `GET /api/v1/post/:id/like`, `GET /api/v1/post/:id/save`
 - **Messages:** `POST /api/v1/message/send/:id`, `GET /api/v1/message/get/:id`
 - **Stories:** Managed under `/api/v1/stories`
 - **Properties:** Managed under `/api/v1/property`
 
 ## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/yourusername/Instagram_clone-main/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Dhumilkachhiya/Estate-Insta/issues).
 
 ## 📝 License
 This project is open-source and available under the [MIT License](LICENSE).
