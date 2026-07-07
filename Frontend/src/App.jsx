@@ -12,6 +12,8 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { io } from "socket.io-client";
 import { setSocket, setOnlineUsers } from "./redux/socketSlice";
+import { setAuthUser } from "./redux/authSlice";
+import axios from "axios";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +56,23 @@ function App() {
   const { user } = useSelector((store) => store.auth);
   const { socket } = useSelector((store) => store.socketio);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          // Clear user session on 401 Unauthorized
+          dispatch(setAuthUser(null));
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.response.eject(interceptor);
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     if (user) {

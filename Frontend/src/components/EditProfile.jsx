@@ -27,7 +27,7 @@ const EditProfile = ({ open, setOpen }) => {
     const formData = new FormData();
     formData.append("bio", bio);
     if (profilePhoto) {
-      formData.append("profilePicture", profilePhoto);
+      formData.append("image", profilePhoto);
     }
     
     try {
