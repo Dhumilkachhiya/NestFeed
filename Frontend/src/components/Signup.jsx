@@ -34,7 +34,13 @@ const Signup = () => {
         navigate("/login");
       }
     } catch (error) {
-      toast.error("Signup failed");
+      const errorMsg = error.response?.data?.message || "Signup failed";
+      const zodErrors = error.response?.data?.errors;
+      if (zodErrors && zodErrors.length > 0) {
+        toast.error(zodErrors[0].message);
+      } else {
+        toast.error(errorMsg);
+      }
     } finally {
       setLoading(false);
     }

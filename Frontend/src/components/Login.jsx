@@ -44,7 +44,13 @@ const Login = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.response?.data?.message);
+      const errorMsg = error.response?.data?.message || "Login failed";
+      const zodErrors = error.response?.data?.errors;
+      if (zodErrors && zodErrors.length > 0) {
+        toast.error(zodErrors[0].message);
+      } else {
+        toast.error(errorMsg);
+      }
     } finally {
       setLoading(false);
     }
